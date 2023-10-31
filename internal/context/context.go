@@ -70,6 +70,10 @@ type SMFContext struct {
 	UEPreConfigPathPool map[string]*UEPreConfigPaths
 	UEDefaultPathPool   map[string]*UEDefaultPaths
 	LocalSEIDCount      uint64
+
+	//*** For UE Statics IPs ** //
+	StaticIPSupport bool
+	UEAddresses     map[string]string // key: IMSI, value: IP
 }
 
 func ResolveIP(host string) net.IP {
@@ -234,6 +238,9 @@ func InitSmfContext(config *factory.Config) {
 	SetupNFProfile(config)
 
 	smfContext.Locality = configuration.Locality
+
+	smfContext.StaticIPSupport = configuration.UEStaticIPs
+
 }
 
 func InitSMFUERouting(routingConfig *factory.RoutingConfig) {
@@ -270,6 +277,21 @@ func InitSMFUERouting(routingConfig *factory.RoutingConfig) {
 			smfContext.UEDefaultPathPool[groupName] = ueDefaultPaths
 		}
 	}
+}
+
+func InitSMFUEAddresses(addressesConfig *factory.UeAddresses) {
+	if !smfContext.StaticIPSupport {
+		return
+	}
+
+	if addressesConfig == nil {
+		logger.CtxLog.Error("configuration needs the addresses config")
+		return
+	}
+
+	UEAddressesConfig := addressesConfig.Addresses
+	smfContext.UEAddresses = UEAddressesConfig
+
 }
 
 func GetSelf() *SMFContext {

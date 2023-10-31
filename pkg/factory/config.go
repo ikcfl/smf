@@ -23,6 +23,7 @@ const (
 	SmfDefaultCertPemPath        = "./cert/smf.pem"
 	SmfDefaultPrivateKeyPath     = "./cert/smf.key"
 	SmfDefaultConfigPath         = "./config/smfcfg.yaml"
+	SmfDefaultUEAddressesPath    = "./config/ueaddresses.yaml"
 	SmfDefaultUERoutingPath      = "./config/uerouting.yaml"
 	SmfSbiDefaultIPv4            = "127.0.0.2"
 	SmfSbiDefaultPort            = 8000
@@ -82,6 +83,7 @@ type Configuration struct {
 	ServiceNameList      []string             `yaml:"serviceNameList" valid:"required"`
 	SNssaiInfo           []*SnssaiInfoItem    `yaml:"snssaiInfos" valid:"required"`
 	ULCL                 bool                 `yaml:"ulcl" valid:"type(bool),optional"`
+	UEStaticIPs          bool                 `yaml:"ueStaticIPs" valid:"type(bool),optional"`
 	PLMNList             []PlmnID             `yaml:"plmnList"  valid:"optional"`
 	Locality             string               `yaml:"locality" valid:"type(string),optional"`
 	UrrPeriod            uint16               `yaml:"urrPeriod,omitempty" valid:"optional"`
@@ -775,4 +777,8 @@ func (c *Config) GetLogReportCaller() bool {
 		return false
 	}
 	return c.Logger.ReportCaller
+}
+
+type UeAddresses struct {
+	Addresses map[string]string `yaml:"addresses"` // key: IMSI, value: IP
 }

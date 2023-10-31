@@ -17,6 +17,7 @@ import (
 var (
 	SmfConfig       *Config
 	UERoutingConfig *RoutingConfig
+	UEAddressConfig *UeAddresses
 )
 
 // TODO: Support configuration update from REST api
@@ -28,6 +29,23 @@ func InitConfigFactory(f string, cfg *Config) error {
 
 	if content, err := ioutil.ReadFile(f); err != nil {
 		return fmt.Errorf("[Factory] %+v", err)
+	} else {
+		logger.CfgLog.Infof("Read config from [%s]", f)
+		if yamlErr := yaml.Unmarshal(content, cfg); yamlErr != nil {
+			return fmt.Errorf("[Factory] %+v", yamlErr)
+		}
+	}
+
+	return nil
+}
+
+func InitUeAddressesConfigFactory(f string, cfg *UeAddresses) error {
+	if f == "" {
+		// Use default config path
+		f = SmfDefaultUEAddressesPath
+	}
+	if content, err := ioutil.ReadFile(f); err != nil {
+		return err
 	} else {
 		logger.CfgLog.Infof("Read config from [%s]", f)
 		if yamlErr := yaml.Unmarshal(content, cfg); yamlErr != nil {
@@ -87,4 +105,21 @@ func ReadUERoutingConfig(cfgPath string) (*RoutingConfig, error) {
 	}
 
 	return ueRoutingCfg, nil
+}
+
+func ReadUEAddressesConfig(cfgPath string) (*UeAddresses, error) {
+	ueAddresses := &UeAddresses{}
+	if err := InitUeAddressesConfigFactory(cfgPath, ueAddresses); err != nil {
+		return nil, fmt.Errorf("ReadConfig [%s] Error: %+v", cfgPath, err)
+	}
+	//	if _, err := ueRoutingCfg.Validate(); err != nil {
+	//		validErrs := err.(govalidator.Errors).Errors()
+	//		for _, validErr := range validErrs {
+	//			logger.CfgLog.Errorf("%+v", validErr)
+	//		}
+	//		logger.CfgLog.Errorf("[-- PLEASE REFER TO SAMPLE CONFIG FILE COMMENTS --]")
+	//		return nil, fmt.Errorf("Config validate Error")
+	//	}
+
+	return ueAddresses, nil
 }

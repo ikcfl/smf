@@ -531,6 +531,14 @@ func (c *SMContext) findPSAandAllocUeIP(param *UPFSelectionParams) error {
 		c.SelectedUPF, c.PDUAddress, c.UseStaticIP = upi.SelectUPFAndAllocUEIP(param)
 		c.Log.Infof("Allocated PDUAdress[%s]", c.PDUAddress.String())
 	}
+
+	self := GetSelf()
+
+	if self.StaticIPSupport && self.UEAddresses[c.Supi] != "" {
+		c.PDUAddress = net.IP(self.UEAddresses[c.Supi])
+		c.Log.Infof("Found static IP, Re-Allocated PDUAdress[%s]", c.PDUAddress.String())
+	}
+
 	if c.PDUAddress == nil {
 		return fmt.Errorf("fail to allocate PDU address, Selection Parameter: %s",
 			param.String())
@@ -557,6 +565,7 @@ func (c *SMContext) AllocUeIP() error {
 	if err := c.findPSAandAllocUeIP(c.SelectionParam); err != nil {
 		return err
 	}
+
 	return nil
 }
 

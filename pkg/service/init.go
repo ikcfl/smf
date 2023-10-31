@@ -100,6 +100,7 @@ func (a *SmfApp) Start(tlsKeyLogPath string) {
 	// allocate id for each upf
 	smf_context.AllocateUPFID()
 	smf_context.InitSMFUERouting(factory.UERoutingConfig)
+	smf_context.InitSMFUEAddresses(factory.UEAddressConfig)
 
 	logger.InitLog.Infoln("Server started")
 	router := logger_util.NewGinWithLogrus(logger.GinLog)

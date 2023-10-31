@@ -39,6 +39,10 @@ func main() {
 			Name:  "uerouting, u",
 			Usage: "Load uerouting configuration from `FILE`",
 		},
+		cli.StringFlag{
+			Name:  "ueaddress, a",
+			Usage: "Load ueaddress configuration from `FILE`",
+		},
 		cli.StringSliceFlag{
 			Name:  "log, l",
 			Usage: "Output NF log to `FILE`",
@@ -70,6 +74,12 @@ func action(cliCtx *cli.Context) error {
 		return err
 	}
 	factory.UERoutingConfig = ueRoutingCfg
+
+	ueAddresses, err := factory.ReadUEAddressesConfig(cliCtx.String("ueaddresses"))
+	if err != nil {
+		return err
+	}
+	factory.UEAddressConfig = ueAddresses
 
 	smf, err := service.NewApp(cfg)
 	if err != nil {
